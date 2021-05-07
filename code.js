@@ -51,9 +51,48 @@ function gridLookup(e){
     return({x:xCoord,y:yCoord})
 }
 
+function lineCheck(check,dir,count){
+    var nextX = check.x;
+    var nextY = check.y;
+    var boardVal = boardState[nextX][nextY];
+    if(boardVal == "empty"){
+        return false;
+    }
+    else if(boardVal == turn){
+        if(count == 3){
+            return(true)
+        }
+        else{
+            count++;
+            check.x += dir.x;
+            check.y += dir.y;
+            return(lineCheck(check,dir,count))
+        }
+    }
+    else{
+        return false
+    }
+
+}
+
 
 function winCheck(coord){
-    alert("hjhkhk")
+    for(var a = -1;a < 2; a++){
+        for(var b = -1; b < 2; b++){
+            var check = {x:coord.x + a,y:coord.y + b};
+            if(!(check.x<0 || check.x>6 || check.y<0 || check.y>6)){
+                if(!(a==0 &&  b== 0) && !(a==0 && b == -1)){
+                    // alert(String(check.x) + " " + String(check.y));
+                    dir = {x:a,y:b};
+                    //alert(String(dir.x) + " " + String(dir.y));
+                    var win = lineCheck(check,dir,1);
+                    if(win){
+                        alert("game over")
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -66,13 +105,15 @@ function dropPieces(){
         var fallCheck = fallingPieces[x][0].coordinate.y + 1;
         if(fallCheck > 6){
             ind_to_remove.push(x);
+            winCheck(fallingPieces[x][0].coordinate)
         }
         else if(boardState[fallingPieces[x][0].coordinate.x][fallCheck] != "empty"){
             ind_to_remove.push(x);
+            winCheck(fallingPieces[x][0].coordinate)
         }
         else{
             boardState[fallingPieces[x][0].coordinate.x][fallingPieces[x][0].coordinate.y] = "empty";
-            boardState[fallingPieces[x][0].coordinate.x][fallCheck] = "filled";
+            boardState[fallingPieces[x][0].coordinate.x][fallCheck] = turn;
             activePieces[fallingPieces[x][1]].coordinate.y++;
         }
     }
@@ -137,8 +178,8 @@ function switchPlayer(){
 
 function draw(e){
     var coord = gridLookup(e);
-    if(boardState[coord.x][coord.y] != "filled"){
-        boardState[coord.x][coord.y] = "filled";
+    if(boardState[coord.x][coord.y] == "empty"){
+        boardState[coord.x][coord.y] = turn;
         activePieces.push({player:turn,coordinate:coord});
         fallingPieces.push([{player:turn,coordinate:coord},activePieces.length-1]);
         switchPlayer();
