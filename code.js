@@ -54,29 +54,40 @@ function gridLookup(e){
 function lineCheck(check,dir,count){
     var nextX = check.x;
     var nextY = check.y;
-    var boardVal = boardState[nextX][nextY];
-    if(boardVal == "empty"){
-        return false;
-    }
-    else if(boardVal == turn){
-        if(count == 3){
-            return(true)
+    if(!(check.x<0 || check.x>6 || check.y<0 || check.y>6)){
+        var boardVal = boardState[nextX][nextY];
+        if(boardVal == "empty"){
+            return count;
+        }
+        else if(boardVal == turn){
+            if(count == 3){
+                count++;
+                return count;
+            }
+            else{
+                count++;
+                check.x += dir.x;
+                check.y += dir.y;
+                return(lineCheck(check,dir,count))
+            }
         }
         else{
-            count++;
-            check.x += dir.x;
-            check.y += dir.y;
-            return(lineCheck(check,dir,count))
+            return count;
         }
     }
     else{
-        return false
+        return count;
     }
+
+
+
+    
 
 }
 
 
 function winCheck(coord){
+    var lineVals = {"11":0,"-1-1":0,"-11":0,"1-1":0,"10":0,"-10":0,"01":0}
     for(var a = -1;a < 2; a++){
         for(var b = -1; b < 2; b++){
             var check = {x:coord.x + a,y:coord.y + b};
@@ -85,14 +96,29 @@ function winCheck(coord){
                     // alert(String(check.x) + " " + String(check.y));
                     dir = {x:a,y:b};
                     //alert(String(dir.x) + " " + String(dir.y));
-                    var win = lineCheck(check,dir,1);
-                    if(win){
-                        alert("game over")
-                    }
+                    var win = lineCheck(check,dir,0);
+                    var key = String(a) + String(b);
+                    lineVals[key] = win;
+                    //alert(win)
+                    //alert(key)
+                    
                 }
             }
         }
     }
+
+    var crossNeg = lineVals["11"] + lineVals["-1-1"]+1;
+    var crossPos = lineVals["1-1"] + lineVals["-11"]+1;
+    var horizontal = lineVals["-10"] + lineVals["10"]+1;
+    var vertical = lineVals["01"]+1;
+
+    var text = String(crossPos) + " " + String(crossNeg) + " " + String(horizontal) + " " + String(vertical)
+
+    //alert(text)
+    if(crossPos >= 4 || crossNeg >= 4 || horizontal >= 4 || vertical >= 4){
+        alert("Game won");
+    }
+
 }
 
 
