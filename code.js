@@ -6,8 +6,19 @@ var activePieces = [];
 var fallingPieces = [];
 
 var turn = "p1"
+var mousePos = {x:0,y:0};
+
+
+function reset(){
+    boardState = [];
+    activePieces = [];
+    fallingPieces = [];
+    turn = "p1"
+    load();
+}
 
 function load(){
+    
     for(var a = 0;a<7;a++){
         boardState.push([]);
         for(var b = 0; b<7;b++){
@@ -17,9 +28,27 @@ function load(){
     }
     canvas = document.getElementById("GameView");
     ctx = canvas.getContext("2d");
+    var t = document.getElementById("Turn").firstChild;
+    t.nodeValue = "Current Turn: P1";
     
     canvas.addEventListener("click",draw);
+    canvas.addEventListener("mousemove",mouseRec);
     window.requestAnimationFrame(update);
+}
+
+function mouseRec(e){
+    var mousePosCheck = gridLookup(e);
+    if(boardState[mousePosCheck.x][mousePosCheck.y] == "empty"){
+        mousePos.x = mousePosCheck.x;
+        mousePos.y = mousePosCheck.y;
+        var text = String(mousePos.x) + String(mousePos.y)
+        //alert(text)
+        requestAnimationFrame(update)
+    }
+    else{
+        mousePos.x = -1;
+    }
+    
 }
 
 function getMousePos(e){
@@ -32,8 +61,8 @@ function getMousePos(e){
 
 function gridLookup(e){
     var pos = getMousePos(e);
-    var xCoord = Math.trunc((pos.x-20)/100);
-    var yCoord = Math.trunc((pos.y -90)/100);
+    var xCoord = Math.trunc((pos.x-10)/100);
+    var yCoord = Math.trunc((pos.y -10)/100);
     if(xCoord > 6){
         xCoord = 6;
     }
@@ -116,7 +145,16 @@ function winCheck(coord){
 
     //alert(text)
     if(crossPos >= 4 || crossNeg >= 4 || horizontal >= 4 || vertical >= 4){
-        alert("Game won");
+        if(turn == "p1"){
+            alert("Game won: P2");
+        }
+        else{
+            alert("Game won: P1");
+        }
+        var t = document.getElementById("Turn").firstChild;
+        t.nodeValue = "Click Reset to play again!";
+        
+        canvas.removeEventListener("click",draw);
     }
 
 }
@@ -168,7 +206,7 @@ function update(){
 
     for(var x = 0; x < 7; x++){
         for(var y = 0; y < 7; y++){
-            ctx.strokeRect(20+x*100,90+y*100,80,80);
+            ctx.strokeRect(20+x*100,20+y*100,80,80);
         }
     }
 
@@ -180,7 +218,12 @@ function update(){
         else{
             ctx.fillStyle = "rgb(200,0,0)";
         }
-        ctx.fillRect(20+activePieces[a].coordinate.x*100,90+activePieces[a].coordinate.y*100,80,80);
+        ctx.fillRect(20+activePieces[a].coordinate.x*100,20+activePieces[a].coordinate.y*100,80,80);
+    }
+
+    if(mousePos.x != -1){
+        ctx.fillStyle = "rgb(0,0,200)";
+        ctx.fillRect(20+mousePos.x*100,20+mousePos.y*100,80,80);
     }
 
     if(fallingPieces.length > 0){
@@ -192,11 +235,14 @@ function update(){
 }
 
 function switchPlayer(){
+    var t = document.getElementById("Turn").firstChild;
     if(turn == "p1"){
         turn = "p2"
+        t.nodeValue = "Current Turn: P2";
     }
     else{
         turn = "p1"
+        t.nodeValue = "Current Turn: P1";
     }
 
 }
