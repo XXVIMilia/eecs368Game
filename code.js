@@ -9,7 +9,7 @@ function load(){
 
     for(var x = 0; x < 7; x++){
         for(var y = 0; y < 7; y++){
-            ctx.fillRect(20+x*100,90+y*100,80,80);
+            ctx.strokeRect(20+x*100,90+y*100,80,80);
         }
     }
 
@@ -48,5 +48,5 @@ function gridLookup(e){
 
 function draw(e){
     var coord = gridLookup(e);
-    alert(String(coord.x) + " " + String(coord.y));
+    ctx.fillRect(20+coord.x*100,90+coord.y*100,80,80)
 }
