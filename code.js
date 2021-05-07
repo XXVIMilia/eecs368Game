@@ -9,6 +9,7 @@ var turn = "p1"
 var mousePos = {x:0,y:0};
 
 
+//Used To reset the game manually
 function reset(){
     boardState = [];
     activePieces = [];
@@ -17,8 +18,9 @@ function reset(){
     load();
 }
 
+
+//On Load Function The sets initial board
 function load(){
-    
     for(var a = 0;a<7;a++){
         boardState.push([]);
         for(var b = 0; b<7;b++){
@@ -36,13 +38,14 @@ function load(){
     window.requestAnimationFrame(update);
 }
 
+
+//Used to draw curser square, called on mouse movement
 function mouseRec(e){
     var mousePosCheck = gridLookup(e);
     if(boardState[mousePosCheck.x][mousePosCheck.y] == "empty"){
         mousePos.x = mousePosCheck.x;
         mousePos.y = mousePosCheck.y;
         var text = String(mousePos.x) + String(mousePos.y)
-        //alert(text)
         requestAnimationFrame(update)
     }
     else{
@@ -51,6 +54,7 @@ function mouseRec(e){
     
 }
 
+//Basic Helper Function that gets current mouse coordinates
 function getMousePos(e){
     var canvasRect = canvas.getBoundingClientRect();
     return{
@@ -59,6 +63,7 @@ function getMousePos(e){
     }
 }
 
+//Converts current mouse coordinate to a grid value and returns it
 function gridLookup(e){
     var pos = getMousePos(e);
     var xCoord = Math.trunc((pos.x-10)/100);
@@ -80,6 +85,8 @@ function gridLookup(e){
     return({x:xCoord,y:yCoord})
 }
 
+//Recursively looks in a given direction and counts squares matching the current square
+//Exits on walls and empty squares, returning the current count
 function lineCheck(check,dir,count){
     var nextX = check.x;
     var nextY = check.y;
@@ -114,7 +121,9 @@ function lineCheck(check,dir,count){
 
 }
 
-
+//Chooses the 7 directions to check lines and stores the counts in each direction
+//Uses 7 directions to find win condition and report victor
+//Removes on click event to placing squares upon winner being found
 function winCheck(coord){
     var lineVals = {"11":0,"-1-1":0,"-11":0,"1-1":0,"10":0,"-10":0,"01":0}
     for(var a = -1;a < 2; a++){
@@ -162,7 +171,7 @@ function winCheck(coord){
 
 
 
-
+//Used to make squares appear to be falling
 function dropPieces(){
     var ind_to_remove = [];
     for(var x = 0; x < fallingPieces.length; x++){
@@ -196,20 +205,15 @@ function dropPieces(){
 
 }
 
-
+//Draws Current board state and recursively does so if a piece is falling
 function update(){
-    
-
     ctx.clearRect(0, 0, 720, 800);
-
-    
 
     for(var x = 0; x < 7; x++){
         for(var y = 0; y < 7; y++){
             ctx.strokeRect(20+x*100,20+y*100,80,80);
         }
     }
-
 
     for(var a = 0;a < activePieces.length;a++){
         if(activePieces[a].player == "p1"){
@@ -230,10 +234,9 @@ function update(){
         dropPieces()
         window.requestAnimationFrame(update);
     }
-    
-
 }
 
+//Updates current turn and the onscreen text 
 function switchPlayer(){
     var t = document.getElementById("Turn").firstChild;
     if(turn == "p1"){
@@ -247,7 +250,8 @@ function switchPlayer(){
 
 }
 
-
+//Called on click of canvas. Gets current mouse grid position and if the space
+//Is empty, it will place a square and begin animation
 function draw(e){
     var coord = gridLookup(e);
     if(boardState[coord.x][coord.y] == "empty"){
