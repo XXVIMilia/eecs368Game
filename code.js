@@ -102,6 +102,7 @@ function draw(e){
     if(boardState[coord.x][coord.y] != "filled"){
         boardState[coord.x][coord.y] = "filled";
         activePieces.push({player:turn,coordinate:coord});
+        fallingPieces.push({player:turn,coordinate:coord});
         switchPlayer();
     }
     
