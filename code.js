@@ -52,7 +52,42 @@ function gridLookup(e){
 }
 
 
+function winCheck(coord){
+    alert("hjhkhk")
+}
+
+
+
+
+
 function dropPieces(){
+    var ind_to_remove = [];
+    for(var x = 0; x < fallingPieces.length; x++){
+        var fallCheck = fallingPieces[x][0].coordinate.y + 1;
+        if(fallCheck > 6){
+            ind_to_remove.push(x);
+        }
+        else if(boardState[fallingPieces[x][0].coordinate.x][fallCheck] != "empty"){
+            ind_to_remove.push(x);
+        }
+        else{
+            boardState[fallingPieces[x][0].coordinate.x][fallingPieces[x][0].coordinate.y] = "empty";
+            boardState[fallingPieces[x][0].coordinate.x][fallCheck] = "filled";
+            activePieces[fallingPieces[x][1]].coordinate.y++;
+        }
+    }
+
+    for(var i = fallingPieces.length-1; i >=0;i-- ){
+        for(var j = 0; j < ind_to_remove.length;j++){
+            if(ind_to_remove[j] == i){
+                fallingPieces.splice(i,1);
+            }
+        }
+    }
+
+    
+
+    
 
 }
 
@@ -81,8 +116,11 @@ function update(){
         ctx.fillRect(20+activePieces[a].coordinate.x*100,90+activePieces[a].coordinate.y*100,80,80);
     }
 
+    if(fallingPieces.length > 0){
+        dropPieces()
+        window.requestAnimationFrame(update);
+    }
     
-    window.requestAnimationFrame(update);
 
 }
 
@@ -102,8 +140,9 @@ function draw(e){
     if(boardState[coord.x][coord.y] != "filled"){
         boardState[coord.x][coord.y] = "filled";
         activePieces.push({player:turn,coordinate:coord});
-        fallingPieces.push({player:turn,coordinate:coord});
+        fallingPieces.push([{player:turn,coordinate:coord},activePieces.length-1]);
         switchPlayer();
+        window.requestAnimationFrame(update);
     }
     
 }
